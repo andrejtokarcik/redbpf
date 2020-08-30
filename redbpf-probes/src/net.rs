@@ -122,8 +122,8 @@ where
     /// Returns the packet's transport header if present.
     #[inline]
     fn transport(&self) -> NetworkResult<Transport> {
+        let ip = self.ip()?;
         unsafe {
-            let ip = self.ip()?;
             let addr = ip as usize + ((*ip).ihl() * 4) as usize;
             let transport = match (*ip).protocol as u32 {
                 IPPROTO_TCP => (Transport::TCP(self.ptr_at(addr)?)),
@@ -132,6 +132,19 @@ where
             };
 
             Ok(transport)
+        }
+    }
+
+    /// Returns the packet's icmp header if present.
+    #[inline]
+    fn icmp(&self) -> NetworkResult<*mut icmphdr> {
+        let ip = self.ip()?;
+        unsafe {
+            let addr = ip as usize + ((*ip).ihl() * 4) as usize;
+            match (*ip).protocol as u32 {
+                IPPROTO_ICMP => self.ptr_at(addr),
+                t => return Err(NetworkError::UnsupportedTransport(t)),
+            }
         }
     }
 

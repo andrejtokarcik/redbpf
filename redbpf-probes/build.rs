@@ -48,6 +48,7 @@ fn main() {
         "iphdr",
         "tcphdr",
         "udphdr",
+        "icmphdr",
         "xdp_action",
         "__sk_.*",
         "sk_.*",
