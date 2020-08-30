@@ -3,3 +3,4 @@
 pub mod bindings;
 pub mod iotop;
 pub mod knock;
+pub mod icmp_echo;

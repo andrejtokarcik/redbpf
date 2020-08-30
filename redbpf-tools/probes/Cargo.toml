@@ -27,3 +27,8 @@ required-features = ["probes"]
 name = "knock"
 path = "src/knock/main.rs"
 required-features = ["probes"]
+
+[[bin]]
+name = "icmp_echo"
+path = "src/icmp_echo/main.rs"
+required-features = ["probes"]
