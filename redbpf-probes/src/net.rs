@@ -23,8 +23,8 @@ use redbpf_macros::impl_network_buffer_array;
 ///
 /// Currently only `TCP` and `UDP` transports are supported.
 pub enum Transport {
-    TCP(*const tcphdr),
-    UDP(*const udphdr),
+    TCP(*mut tcphdr),
+    UDP(*mut udphdr),
 }
 
 impl Transport {
@@ -72,14 +72,14 @@ where
     }
 
     #[inline]
-    unsafe fn ptr_at<U>(&self, addr: usize) -> NetworkResult<*const U> {
+    unsafe fn ptr_at<U>(&self, addr: usize) -> NetworkResult<*mut U> {
         self.check_bounds(addr, addr + mem::size_of::<U>())?;
 
-        Ok(addr as *const U)
+        Ok(addr as *mut U)
     }
 
     #[inline]
-    unsafe fn ptr_after<T, U>(&self, prev: *const T) -> NetworkResult<*const U> {
+    unsafe fn ptr_after<T, U>(&self, prev: *mut T) -> NetworkResult<*mut U> {
         self.ptr_at(prev as usize + mem::size_of::<T>())
     }
 
@@ -102,13 +102,13 @@ where
 
     /// Returns the packet's `Ethernet` header if present.
     #[inline]
-    fn eth(&self) -> NetworkResult<*const ethhdr> {
+    fn eth(&self) -> NetworkResult<*mut ethhdr> {
         unsafe { self.ptr_at(self.data_start() as usize) }
     }
 
     /// Returns the packet's `IP` header if present.
     #[inline]
-    fn ip(&self) -> NetworkResult<*const iphdr> {
+    fn ip(&self) -> NetworkResult<*mut iphdr> {
         let eth = self.eth()?;
         unsafe {
             if (*eth).h_proto != u16::from_be(ETH_P_IP as u16) {
